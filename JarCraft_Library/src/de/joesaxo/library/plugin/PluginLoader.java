@@ -4,8 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -15,8 +18,17 @@ public class PluginLoader {
 	
 	@SuppressWarnings("resource")
 	public static List<Class<?>> loadFile(File file) throws FileNotFoundException, IOException {
-		List<Class<?>> classes = new ArrayList<Class<?>>();
-		ClassLoader cl = new URLClassLoader(new URL[] { file.toURI().toURL() });
+	    List<Class<?>> classes = new ArrayList<>();
+        ClassLoader cl = createClassLoaderFromFile(file);
+
+	    if (file.getName().toLowerCase().endsWith(".class")) {
+	        Class<?> cls = loadClass(file, cl);
+	        if (cls != null) {
+	            classes.add(cls);
+            }
+            return classes;
+        }
+
 		JarInputStream jaris = new JarInputStream(new FileInputStream(file));
 		JarEntry ent = null;
 		while ((ent = jaris.getNextJarEntry()) != null) {
@@ -31,6 +43,25 @@ public class PluginLoader {
 		jaris.close();
 		return classes;
 	}
+
+    public static ClassLoader createClassLoaderFromFile(File file) throws IOException{
+        return new URLClassLoader(new URL[] { file.toURI().toURL() });
+    }
+
+    public static Class<?> loadClass(File file) throws IOException{
+	    return loadClass(file, createClassLoaderFromFile(file));
+    }
+
+	public static Class<?> loadClass(File classFile, ClassLoader cl) {
+        if (classFile.getName().toLowerCase().endsWith(".class")) {
+            try {
+                return (cl.loadClass(classFile.getName().substring(0, classFile.getName().length() - 6).replace('/', '.')));
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 
 	public static List<Class<?>> loadPath(File path, String fileType) throws FileNotFoundException, IOException {
 		if (fileType == null) fileType = "";
@@ -47,22 +78,32 @@ public class PluginLoader {
 		return loadPath(path, null);
 	}
 
-	@SuppressWarnings("unchecked") //compiler doesn't know that "iface" is P, so parsing "cls" to "Class<P>" is checked with "clsi.equals(iface)"
-	public static <C> List<Class<C>> filterClasses(List<Class<?>> classes, Class<C> iface) {
-		List<Class<C>> pluggableclasses = new ArrayList<Class<C>>();
+	 //compiler doesn't know that "iface" is P, so parsing "cls" to "Class<P>" is checked with "clsi.equals(iface)"
+	public static <C> List<Class<C>> classFilter(List<Class<?>> classes, Class<C> iface) {
+		List<Class<C>> pluggableclasses = new ArrayList<>();
 		for (Class<?> cls : classes) {
-			boolean matches = false;
-			if (iface.equals(cls.getSuperclass())) matches = true;
-			
-			for (Class<?> clsi : cls.getInterfaces()) {
-				if(iface.equals(clsi)) {
-					matches = true;
-				}
-			}
-			if (matches) {
-				pluggableclasses.add((Class<C>)cls);
+			if (checkClass(cls, iface)) {
+				pluggableclasses.add(convert(cls));
 			}
 		}
 		return pluggableclasses;
 	}
+
+	public static <C> boolean checkClass(Class<?> cls, Class<C> iface) {
+		if (iface.equals(cls.getSuperclass())) return true;
+
+		for (Class<?> clsi : cls.getInterfaces()) {
+			if(iface.equals(clsi)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public static <C> Class<C> convert(Class<?> cls) {
+		return (Class<C>) cls;
+	}
+
+
 }

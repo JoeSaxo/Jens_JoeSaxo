@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.joesaxo.library.plugin.PluginLoader.*;
+
 public class PluginManager <P> {
 	
 	private Class<P> pluginType;
@@ -18,7 +20,7 @@ public class PluginManager <P> {
 	}
 
 	public int loadPluginsFromFile(File file) throws FileNotFoundException, IOException {
-		List<P> newPlugins = instantiatePlugins(filterClasses(PluginLoader.loadFile(file)));
+		List<P> newPlugins = instantiatePlugins(filterClasses(loadFile(file)));
 		pluginClasses.addAll(newPlugins);
 		return newPlugins.size();
 	}
@@ -27,7 +29,7 @@ public class PluginManager <P> {
 		if (fileType == null) fileType = "";
 		List<P> newPlugins;
 		try {
-			newPlugins = instantiatePlugins(filterClasses(PluginLoader.loadPath(path, fileType)));
+			newPlugins = instantiatePlugins(filterClasses(loadPath(path, fileType)));
 		} catch (FileNotFoundException e) {
 			return -1;
 		}
@@ -39,8 +41,8 @@ public class PluginManager <P> {
 		return loadPluginsFromPath(path, null);
 	}
 
-	private List<Class<P>> filterClasses(List<Class<?>> classes) {
-		return PluginLoader.filterClasses(classes, pluginType);
+	protected List<Class<P>> filterClasses(List<Class<?>> classes) {
+		return classFilter(classes, pluginType);
 	}
 
 	private List<P> instantiatePlugins(List<Class<P>> plugins) {
@@ -49,7 +51,6 @@ public class PluginManager <P> {
 			P instance;
 			try {
 				instance = (P) cls.newInstance();
-				System.out.println(instance.getClass());
 				instances.add(instance);
 			} catch (InstantiationException e) {
 				instantiationException(e, cls.getName());
