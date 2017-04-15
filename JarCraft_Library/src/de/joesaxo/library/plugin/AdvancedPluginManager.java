@@ -31,18 +31,66 @@ public class AdvancedPluginManager <C> extends PluginManager <C>{
 	    return filteredClasses;
 	}
 
-	public void callMethod(AnnotationModule annotationParrameter, Object[] parameters) {
-	    for (Object object : getLoadedPlugins()) {
-            for (Method method : object.getClass().getDeclaredMethods()) {
-                Annotation annotation = getAnnotationFromModule(method, annotationParrameter);
-                if (annotation != null) {
-                    if (annotationMatchesModule(annotation, annotationParrameter)) {
-                        if (isInvokableMethod(method, parameters)) {
-                            invokeMethod(method, object, parameters);
-                        }
+    public void callMethod(int index, AnnotationModule annotationModule, Object[] parameters) {
+        C object = getLoadedPlugins().get(index);
+        for (Method method : object.getClass().getDeclaredMethods()) {
+            Annotation annotation = getAnnotationFromModule(method, annotationModule);
+            if (annotation != null) {
+                if (annotationMatchesModule(annotation, annotationModule)) {
+                    if (isInvokableMethod(method, parameters)) {
+                        invokeMethod(method, object, parameters);
                     }
                 }
             }
-	    }
+        }
+    }
+
+    public void callMethod(int index, Class<? extends Annotation> annotation, Object[] parameters) {
+        callMethod(index, new AnnotationModule(annotation), parameters);
+    }
+
+    public void callMethod(int index, AnnotationModule annotationModule, Object parameter) {
+        callMethod(index, annotationModule, new Object[]{parameter});
+    }
+
+    public void callMethod(int index, Class<? extends Annotation> annotation, Object parameter) {
+        callMethod(index, new AnnotationModule(annotation), new Object[]{parameter});
+    }
+
+    public void callMethod(AnnotationModule annotationModule, Object[] parameters) {
+        for (int i = 0; i < getLoadedPlugins().size(); i++) {
+            callMethod(i, annotationModule, parameters);
+        }
+    }
+
+    public void callMethod(Class<? extends Annotation> annotation, Object[] parameters) {
+        callMethod(new AnnotationModule(annotation), parameters);
+    }
+
+    public void callMethod(AnnotationModule annotationModule, Object parameter) {
+        callMethod(annotationModule, new Object[]{parameter});
+    }
+
+    public void callMethod(Class<? extends Annotation> annotation, Object parameter) {
+        callMethod(new AnnotationModule(annotation), new Object[]{parameter});
+    }
+
+    public Object getPluginData(int index, String name) {
+        Annotation annotation = getAnnotationFromModule(getLoadedPlugins().get(index).getClass(), classAnnotation);
+        Method[] methods = getMethodsFromAnnotation(annotation);
+        for (Method method : methods) {
+            if (method.getName().equals(name)) {
+                return invokeMethod(method, annotation);
+            }
+        }
+        return null;
+    }
+
+    public Object[] getPluginData(String name) {
+        Object[] objects = new Object[getLoadedPlugins().size()];
+        for (int i = 0; i < objects.length; i++) {
+            objects[i] = getPluginData(i, name);
+        }
+        return objects;
     }
 }
