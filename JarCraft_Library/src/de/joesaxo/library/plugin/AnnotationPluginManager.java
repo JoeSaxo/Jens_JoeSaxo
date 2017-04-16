@@ -15,4 +15,5 @@ public class AnnotationPluginManager extends PluginManager<Object> {
         super(annotation, Object.class);
     }
 
+
 }

@@ -16,7 +16,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
 public class GenericPluginLoader {
-	
+
 	@SuppressWarnings("resource")
 	public static Class<?>[] loadFile(File file) throws FileNotFoundException, ClassNotFoundException, IOException {
 	    Class<?>[] classes = new Class<?>[loadableClasses(file)];
@@ -160,5 +160,6 @@ public class GenericPluginLoader {
     public static <E> E[] createArray(E element, int length) {
         return (E[]) Array.newInstance(element.getClass(), length);
     }
+
 
 }

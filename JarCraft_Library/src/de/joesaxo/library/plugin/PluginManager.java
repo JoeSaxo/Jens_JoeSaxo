@@ -98,4 +98,5 @@ public class PluginManager<C> extends GenericPluginManager<C> {
         }
         return objects;
     }
+
 }

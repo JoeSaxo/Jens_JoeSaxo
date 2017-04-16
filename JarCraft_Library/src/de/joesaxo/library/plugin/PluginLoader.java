@@ -144,4 +144,5 @@ public class PluginLoader extends GenericPluginLoader {
         }
         return removeEmpty(annotatedClasses);
     }
+
 }

@@ -96,5 +96,6 @@ public class GenericPluginManager<P> {
 	public void instantiationException(InstantiationException e, String pluginName) {}
 	
 	public void illegalAccessException(IllegalAccessException e, String pluginName) {}
-    
+
+
 }
