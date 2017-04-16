@@ -6,7 +6,7 @@ import de.joesaxo.library.plugin.annotations.APluginMethod;
 /**
  * Created by Jens on 15.04.2017.
  */
-@APlugin(name="MyFirstPluginWithAnnotations")
+@APlugin("MyFirstPluginWithAnnotations")
 public class Main {
 
     @APluginMethod()

@@ -11,6 +11,6 @@ public @interface APluginMethod {
 
     boolean execute() default true;
 
-    String name() default "";
+    String value() default "";
 
 }

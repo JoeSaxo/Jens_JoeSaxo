@@ -11,6 +11,6 @@ public @interface APlugin {
 
     boolean load() default true;
 
-    String name();
+    String value();
 
 }

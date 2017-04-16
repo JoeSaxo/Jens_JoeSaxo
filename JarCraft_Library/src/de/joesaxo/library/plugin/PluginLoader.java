@@ -1,109 +1,147 @@
 package de.joesaxo.library.plugin;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
 
-public class PluginLoader {
-	
-	@SuppressWarnings("resource")
-	public static List<Class<?>> loadFile(File file) throws FileNotFoundException, IOException {
-	    List<Class<?>> classes = new ArrayList<>();
-        ClassLoader cl = createClassLoaderFromFile(file);
+/**
+ * Created by Jens on 15.04.2017.
+ */
+public class PluginLoader extends GenericPluginLoader {
 
-	    if (file.getName().toLowerCase().endsWith(".class")) {
-	        Class<?> cls = loadClass(file, cl);
-	        if (cls != null) {
-	            classes.add(cls);
-            }
-            return classes;
+    public static Object invokeMethod(Method method, Object object, Object[] parameters) {
+        try {
+            return method.invoke(object, parameters);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
         }
-
-		JarInputStream jaris = new JarInputStream(new FileInputStream(file));
-		JarEntry ent = null;
-		while ((ent = jaris.getNextJarEntry()) != null) {
-			if (ent.getName().toLowerCase().endsWith(".class")) {
-					try {
-						classes.add(cl.loadClass(ent.getName().substring(0, ent.getName().length() - 6).replace('/', '.')));
-					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
-					}
-			}
-		}
-		jaris.close();
-		return classes;
-	}
-
-    public static ClassLoader createClassLoaderFromFile(File file) throws IOException{
-        return new URLClassLoader(new URL[] { file.toURI().toURL() });
+        return null;
     }
 
-    public static Class<?> loadClass(File file) throws IOException{
-	    return loadClass(file, createClassLoaderFromFile(file));
+    public static Object invokeMethod(Method method, Object object) {
+        return invokeMethod(method, object, new Object[]{});
     }
 
-	public static Class<?> loadClass(File classFile, ClassLoader cl) {
-        if (classFile.getName().toLowerCase().endsWith(".class")) {
-            try {
-                return (cl.loadClass(classFile.getName().substring(0, classFile.getName().length() - 6).replace('/', '.')));
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+    public static boolean isInvokableMethod(Method method, Object[] parameters) {
+        Type[] neededParameters = method.getGenericParameterTypes();
+        if (neededParameters.length != parameters.length) return false;
+
+        for (int i = 0; i < parameters.length; i++) {
+            if (!parameters[i].getClass().equals(neededParameters[i])) return false;
+        }
+        return true;
+    }
+
+    public static boolean isObjetctMethod(Method method) {
+        Method[] methodsOfClassObject = Object.class.getDeclaredMethods();
+        for (Method objectMethod : methodsOfClassObject) {
+            if (method.equals(objectMethod)) return true;
+        }
+        return false;
+    }
+
+    public static <A  extends Annotation> A getAnnotationFromModule(Method method, AnnotationModule annotationModule) {
+        A annotation = getAnnotationFromClass(method, annotationModule.getAnnotation());
+        if (annotation != null) {
+            if (annotationMatchesModule(annotation, annotationModule)) {
+                return annotation;
             }
         }
         return null;
     }
 
-	public static List<Class<?>> loadPath(File path, String fileType) throws FileNotFoundException, IOException {
-		if (fileType == null) fileType = "";
-		List<Class<?>> classes = new ArrayList<Class<?>>();
-		for (File file : path.listFiles()) {
-			if(file.toString().endsWith(fileType) && !file.isDirectory()) {
-				classes.addAll(loadFile(file));
-			}
-		}
-		return classes;
-	}
+    public static <A  extends Annotation> A getAnnotationFromModule(Class<?> cls, AnnotationModule annotationModule) {
+        A annotation = getAnnotationFromClass(cls, annotationModule.getAnnotation());
+        if (annotation != null) {
+            if (annotationMatchesModule(annotation, annotationModule)) {
+                return annotation;
+            }
+        }
+        return null;
+    }
 
-	public static List<Class<?>> loadPath(File path) throws FileNotFoundException, IOException {
-		return loadPath(path, null);
-	}
+    public static <A  extends Annotation> A getAnnotationFromClass(Method method, Class<? extends Annotation> annotationClass) {
+        return getAnnotationFromClass(method.getDeclaredAnnotations(), annotationClass);
+    }
 
-	 //compiler doesn't know that "iface" is P, so parsing "cls" to "Class<P>" is checked with "clsi.equals(iface)"
-	public static <C> List<Class<C>> classFilter(List<Class<?>> classes, Class<C> iface) {
-		List<Class<C>> pluggableclasses = new ArrayList<>();
-		for (Class<?> cls : classes) {
-			if (checkClass(cls, iface)) {
-				pluggableclasses.add(convert(cls));
-			}
-		}
-		return pluggableclasses;
-	}
+    public static <A  extends Annotation> A getAnnotationFromClass(Class<?> cls, Class<? extends Annotation> annotationClass) {
+        return getAnnotationFromClass(cls.getAnnotations(), annotationClass);
+    }
 
-	public static <C> boolean checkClass(Class<?> cls, Class<C> iface) {
-		if (iface.equals(cls.getSuperclass())) return true;
-
-		for (Class<?> clsi : cls.getInterfaces()) {
-			if(iface.equals(clsi)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public static <C> Class<C> convert(Class<?> cls) {
-		return (Class<C>) cls;
-	}
+    private static <A  extends Annotation> A getAnnotationFromClass(Annotation[] annotations, Class<? extends Annotation> annotationClass) {
+        for (Annotation methodAnnotation : annotations) {
+            if (methodAnnotation.annotationType().equals(annotationClass)) {
+                return (A)methodAnnotation;
+            }
+        }
+        return null;
+    }
 
 
+
+    public static boolean annotationMatchesModule(Annotation annotation, AnnotationModule parameters) {
+        for (int i = 0; i < parameters.parameters(); i++) {
+            String name = parameters.getParameterName(i);
+            Object value = parameters.getParameterValue(i);
+            if (!annotationMatchesParameter(annotation, name, value)) return false;
+        }
+        return true;
+    }
+
+    public static boolean annotationMatchesParameter(Annotation annotation, String name, Object value) {
+        for (Method method : getMethodsFromAnnotation(annotation)) {
+                if (method.getName().equals(name)) {
+                    if (value.equals(invokeMethod(method, annotation))) return true;
+                }
+        }
+        return false;
+    }
+
+    public static Object getDataFromAnnotation(Annotation annotation, String name) {
+        Method[] methods = getMethodsFromAnnotation(annotation);
+        for (Method method : methods) {
+            if (method.getName().equals(name)) {
+                return invokeMethod(method, annotation);
+            }
+        }
+        return null;
+    }
+
+    public static Method[] getMethodsFromAnnotation(Annotation annotation) {
+        Method[] methods = annotation.annotationType().getDeclaredMethods();
+        return removeObjectMethods(methods);
+    }
+
+    public static Method[] removeObjectMethods(Method[] methods) {
+        int unneededMethods = 0;
+        for (Method method : methods) {
+            if (isObjetctMethod(method)) unneededMethods++;
+        }
+        Method[] newMethods = new Method[methods.length - unneededMethods];
+        int skippedMethods = 0;
+        for (int i = 0; i < methods.length; i++) {
+            if (!isObjetctMethod(methods[i])) {
+                newMethods[i-skippedMethods] = methods[i];
+            } else {
+                skippedMethods++;
+            }
+        }
+        return newMethods;
+    }
+
+    public static <C> Class<C>[] classFilter(Class<C>[] classes, AnnotationModule annotationParrameter) {
+        Class<C>[] annotatedClasses = (Class<C>[])new Class<?>[classes.length];
+        for (int i = 0; i < classes.length; i++) {
+            if (getAnnotationFromModule(classes[i], annotationParrameter) != null) {
+                annotatedClasses[i] = GenericPluginLoader.convert(classes[i]);
+            }
+        }
+        return removeEmpty(annotatedClasses);
+    }
 }
