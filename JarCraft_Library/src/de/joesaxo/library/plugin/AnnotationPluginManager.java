@@ -1,5 +1,6 @@
 package de.joesaxo.library.plugin;
 
+import de.joesaxo.library.annotation.Module;
 import java.lang.annotation.Annotation;
 
 /**
@@ -7,7 +8,7 @@ import java.lang.annotation.Annotation;
  */
 public class AnnotationPluginManager extends PluginManager<Object> {
 
-    public AnnotationPluginManager(AnnotationModule annotationModule) {
+    public AnnotationPluginManager(Module annotationModule) {
         super(annotationModule, Object.class);
     }
 

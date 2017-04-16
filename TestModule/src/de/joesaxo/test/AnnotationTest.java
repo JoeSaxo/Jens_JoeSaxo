@@ -1,10 +1,8 @@
 package de.joesaxo.test;
 
-import de.joesaxo.library.plugin.AnnotationModule;
+import de.joesaxo.library.annotation.Module;
 import de.joesaxo.library.plugin.PluginManager;
 import de.joesaxo.library.plugin.AnnotationPluginManager;
-import de.joesaxo.library.plugin.annotations.APlugin;
-import de.joesaxo.library.plugin.annotations.APluginMethod;
 
 import java.io.File;
 
@@ -14,15 +12,23 @@ import java.io.File;
 
 public class AnnotationTest {
 
+    public static final String path = "C:\\Users\\Jens\\Documents\\Java\\PluginTest\\";
 
     public static void main(String[] args) {
 
-
         PluginManager pluginManager = createPuginManager();
-        File directory = new File("C:\\Users\\Jens\\Documents\\Java\\PluginTest\\");
-        pluginManager.loadPluginsFromPath(directory);
 
-        pluginManager.callMethod(createMethodModule1(), "!?!Hello World!?!");
+        pluginManager.loadPluginsFromPath(new File(path));
+
+        Module mStart = createModuleStart();
+        Module mResume = createModuleResume();
+        Module mStop = createModuleStop();
+
+        pluginManager.callMethod(mStart, "!?!Hello World!?!");
+        pluginManager.callMethod(mResume, "!?!Hello World!?!");
+        pluginManager.callMethod(mStop, "!?!Hello World!?!");
+
+        pluginManager.callMethod(createModule("PluginTestName")); // no method is affected because [name] is only class name
 
         System.out.println();
 
@@ -33,17 +39,31 @@ public class AnnotationTest {
     }
 
     public static AnnotationPluginManager createPuginManager() {
-        AnnotationModule classModule = new AnnotationModule(APlugin.class);
+        Module classModule = new Module(APlugin.class);
         classModule.addParameter("load", true);
 
         return new AnnotationPluginManager(classModule);
     }
 
-    public static AnnotationModule createMethodModule1() {
-        return new AnnotationModule(APluginMethod.class)
-                .addParameter("execute", true)
-                .addParameter("value", "");
-
+    public static Module createModuleStart() {
+        return createModule("startMethod");
     }
 
+    public static Module createModuleResume() {
+        return createModule("resumeMethod");
+    }
+
+    public static Module createModuleStop() {
+        return createModule("stopMethod");
+    }
+
+    public static Module createModule(String name) {
+        return createModule()
+                .addParameter("value", name);
+    }
+
+    public static Module createModule() {
+        return new Module(APlugin.class)
+                .addParameter("load", true);
+    }
 }

@@ -1,17 +1,13 @@
 package de.joesaxo.library.plugin;
 
+import de.joesaxo.library.array.Array;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
@@ -45,7 +41,7 @@ public class GenericPluginLoader {
 			}
 		}
 		jaris.close();
-		return removeEmpty(classes);
+		return Array.removeEmptyLines(classes);
 	}
 
 	public static int loadableClasses(File file) throws IOException {
@@ -88,7 +84,7 @@ public class GenericPluginLoader {
                 files[i] = null;
             }
         }
-        files = removeEmpty(files);
+        files = Array.removeEmptyLines(files);
 
         int loadedClasses = 0;
 		Class<?>[] classes = new Class<?>[loadableClasses];
@@ -99,7 +95,7 @@ public class GenericPluginLoader {
 		        loadedClasses++;
             }
 		}
-		return removeEmpty(classes);
+		return Array.removeEmptyLines(classes);
 	}
 
 	public static Class<?>[] loadPath(File path) throws FileNotFoundException, ClassNotFoundException, IOException {
@@ -134,32 +130,7 @@ public class GenericPluginLoader {
 	}
 
 
-	public static <T> T[] removeEmpty(T[] array) {
-		Class<T> arrayType = null;
-		int empty = 0;
-		for (int i = 0; i < array.length; i++) {
-			if (array[i] == null) {
-				empty++;
-			} else if (arrayType == null) {
-				arrayType = (Class<T>)((T)array[i]).getClass();
-			}
-		}
-		if (arrayType == null) return null;
-		int skipped = 0;
-		T[] newArray = (T[]) Array.newInstance(arrayType, array.length-empty);
-		for (int i = 0; i < array.length; i++) {
-			if (array[i] != null) {
-				newArray[i-skipped] = array[i];
-			} else {
-				skipped++;
-			}
-		}
-		return newArray;
-	}
 
-    public static <E> E[] createArray(E element, int length) {
-        return (E[]) Array.newInstance(element.getClass(), length);
-    }
 
 
 }

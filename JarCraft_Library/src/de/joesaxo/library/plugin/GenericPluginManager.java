@@ -1,5 +1,7 @@
 package de.joesaxo.library.plugin;
 
+import de.joesaxo.library.array.Array;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -61,7 +63,7 @@ public class GenericPluginManager<P> {
 			P instance;
 			try {
 				instance = (P) plugins[i].newInstance();
-				if (instances == null) instances = createArray(instance, plugins.length);
+				if (instances == null) instances = Array.createArray(instance, plugins.length);
 				instances[i] = instance;
 			} catch (InstantiationException e) {
 				instantiationException(e, plugins[i].getName());
@@ -69,7 +71,7 @@ public class GenericPluginManager<P> {
 				illegalAccessException(e, plugins[i].getName());
 			}
 		}
-		return removeEmpty(instances);
+		return Array.removeEmptyLines(instances);
 	}
 
 	private void addClasses(P[] newClasses) {
@@ -78,7 +80,7 @@ public class GenericPluginManager<P> {
 			pluginClasses = newClasses;
 			return;
 		}
-		P[] newClassArray = createArray(newClasses[0], pluginClasses.length + newClasses.length);
+		P[] newClassArray = Array.createArray(newClasses[0], pluginClasses.length + newClasses.length);
 		for (int i = 0; i < pluginClasses.length; i++) {
 			newClassArray[i] = pluginClasses[i];
 		}
