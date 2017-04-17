@@ -6,18 +6,7 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ef4a66e9-b9b7-47b2-b9c4-4d7bfb78fb63" name="Default" comment="Update of the JarCraft_Library:&#10;idea folders and files for IntelliJ.">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/JarCraft_Library/src/de/joesaxo/library/annotation/AnnotationManager.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/JarCraft_Library/src/de/joesaxo/library/annotation/MethodHandler.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/JarCraft_Library/src/de/joesaxo/library/annotation/Module.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/JarCraft_Library/src/de/joesaxo/library/server/DevClient.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/JarCraft_Library/src/de/joesaxo/library/server/client/Client.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/JarCraft_Library/src/de/joesaxo/library/server/server/Server.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/JarCraft_Library/src/de/joesaxo/library/server/server/ServerRunnable.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/TestModule/src/de/joesaxo/test/server/MyClient.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/JarCraft_Library/de/joesaxo/library/annotation/AnnotationManager.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/JarCraft_Library/de/joesaxo/library/annotation/Module.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/TestModule/de/joesaxo/test/annotation/AnnotationTest.class" afterPath="" />
+    <list default="true" id="ef4a66e9-b9b7-47b2-b9c4-4d7bfb78fb63" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -56,6 +45,12 @@
     <option name="externalProjectsViewState">
       <projects_view />
     </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/JarCraft_Library/src/de/joesaxo/library/plugin/GenericPluginLoader.java" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/LGBK/src/de/lgbk/alich/jens/Array.java" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/LGBK/src/de/lgbk/alich/jens/ArrayNumber.java" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/LGBK/src/de/lgbk/alich/jens/NumberArray.java" root0="SKIP_INSPECTION" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -359,7 +354,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Font" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/JarCraft_Library" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/LGBK" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
