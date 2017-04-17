@@ -1,5 +1,7 @@
 package de.joesaxo.library.annotation;
 
+import com.sun.org.apache.xpath.internal.operations.Mod;
+
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -38,6 +40,11 @@ public class Module {
         return this;
     }
 
+    public Module addParameter(Object value) {
+        parameters.add(new Parameter(value));
+        return this;
+    }
+
     public int parameters() {
         return parameters.size();
     }
@@ -51,6 +58,7 @@ public class Module {
     }
 
     public boolean matches(Annotation annotation) {
+        if (!annotation.annotationType().equals(this.annotation)) return false;
         for (int i = 0; i < this.parameters(); i++) {
             Parameter parameter = this.getParameter(i);
             if (!parameter.matches(annotation)) return false;
@@ -58,23 +66,21 @@ public class Module {
         return true;
     }
 
-
-    private Annotation getAnnotationObject(Annotation[] annotations) {
-        for (Annotation annotation : annotations) {
-            if (annotation.annotationType().equals(this.annotation)) {
-                if (this.matches(annotation)) {
-                    return annotation;
-                }
-            }
+    public Module getCopy() {
+        Module copy = new Module(annotation);
+        for (Parameter parameter : parameters) {
+            copy.addParameter(parameter);
         }
-        return null;
+        return copy;
     }
 
+
+
     public Annotation getAnnotationObject(Method method) {
-        return getAnnotationObject(method.getDeclaredAnnotations());
+        return AnnotationHandler.getAnnotationObject(method.getDeclaredAnnotations(), this);
     }
 
     public Annotation getAnnotationObject(Class<?> cls) {
-        return getAnnotationObject(cls.getAnnotations());
+        return AnnotationHandler.getAnnotationObject(cls.getAnnotations(), this);
     }
 }

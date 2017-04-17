@@ -1,6 +1,6 @@
 package de.joesaxo.plugin.testplugin;
 
-import de.joesaxo.test.APlugin;
+import de.joesaxo.test.annotation.APlugin;
 
 /**
  * Created by Jens on 15.04.2017.

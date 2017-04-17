@@ -1,11 +1,6 @@
 package de.joesaxo.library.server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,15 +43,15 @@ class IOStream {
 
 	}
 	
-	boolean ready(MessageType messageType) throws IOException {
+	boolean ready(EMessageType messageType) throws IOException {
 		update();
 		for (int i = 0; i < buffer.size()-1; i++) {
 			if (buffer.get(i).startsWith(messageType.getCharacterAsString())) return true;
 		}
 		return false;
 	}
-	
-	String read(MessageType messageType) {
+
+	String read(EMessageType messageType) {
 		update();
 		for (int i = 0; i < buffer.size()-1; i++) {
 			if (buffer.get(i).startsWith(messageType.getCharacterAsString())) {
@@ -65,7 +60,7 @@ class IOStream {
 		}
 		return null;
 	}
-	
+
 	private void update() {
 		try {
 			while (bufferedreader.ready()) {
@@ -80,7 +75,7 @@ class IOStream {
 		} catch (IOException e) {}
 	}
 
-	boolean write(String text, MessageType type) {
+	boolean write(String text, EMessageType type) {
 		if (printwriter.checkError()) return false;
 		String[] strings = text.split("\n");
 		for (String string : strings) {

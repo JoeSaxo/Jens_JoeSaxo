@@ -1,13 +1,11 @@
 package de.joesaxo.library.server.client;
 
-import java.io.IOException;
-import java.net.Socket;
-
+import de.joesaxo.library.server.DevClient;
+import de.joesaxo.library.annotation.AnnotationManager;
 import org.jarcraft.library.time.Time;
 
-import de.joesaxo.library.server.DevClient;
-import de.joesaxo.library.server.interfaces.IConnection;
-import de.joesaxo.library.server.interfaces.IReceiver;
+import java.io.IOException;
+import java.net.Socket;
 
 class ClientRunnable extends DevClient implements Runnable {
 
@@ -15,8 +13,8 @@ class ClientRunnable extends DevClient implements Runnable {
 	private String IP;
 	private boolean stopped;
 
-	ClientRunnable(String IP, int port, IReceiver iReceiver, IConnection iConnection) {
-		super(iReceiver, iConnection);
+	ClientRunnable(String IP, int port, AnnotationManager annotationManager) {
+		super(annotationManager);
 		this.IP = IP;
 		this.port = port;
 		stopped = false;

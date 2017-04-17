@@ -1,5 +1,6 @@
 package de.joesaxo.library.plugin;
 
+import de.joesaxo.library.annotation.AnnotationManager;
 import de.joesaxo.library.annotation.Module;
 import de.joesaxo.library.annotation.Parameter;
 
@@ -13,19 +14,29 @@ import static de.joesaxo.library.plugin.PluginLoader.*;
 public class PluginManager<C> extends GenericPluginManager<C> {
 
 	Module classAnnotation;
+	AnnotationManager annotationManager;
 
     public PluginManager(Module pluginAnnotation, Class<C> type) {
         super(type);
+        annotationManager = new AnnotationManager(pluginAnnotation);
         classAnnotation = pluginAnnotation;
     }
 
     public PluginManager(Class<? extends Annotation> annotation, Class<C> type) {
         super(type);
+        annotationManager = new AnnotationManager(new Module(annotation));
         classAnnotation = new Module(annotation);
     }
 
     public PluginManager(Class<C> type) {
         super(type);
+        annotationManager = new AnnotationManager();
+    }
+
+    @Override
+    public void addClasses(C[] newClasses) {
+        super.addClasses(newClasses);
+        annotationManager.setClasses(getLoadedPlugins());
     }
 
 	@Override
@@ -36,15 +47,7 @@ public class PluginManager<C> extends GenericPluginManager<C> {
 	}
 
     public void callMethod(int index, Module annotationModule, Object[] parameters) {
-        C object = getLoadedPlugins()[index];
-        for (Method method : object.getClass().getDeclaredMethods()) {
-            Annotation annotation = annotationModule.getAnnotationObject(method);
-            if (annotation != null) {
-                if (isInvokableMethod(method, parameters)) {
-                    invokeMethod(method, object, parameters);
-                }
-            }
-        }
+        annotationManager.invokeMethods(annotationModule, parameters);
     }
 
     public void callMethod(int index, Module annotationModule, Object parameter) {
@@ -69,29 +72,12 @@ public class PluginManager<C> extends GenericPluginManager<C> {
         callMethod(annotationModule, new Object[]{});
     }
 
-    public List<Object> getPluginMethodData(int index, String name, Module annotationModule) {
-        List<Object> objectList = new ArrayList<>();
-        C object = getLoadedPlugins()[index];
-        for (Method method : object.getClass().getDeclaredMethods()) {
-            Annotation annotation = annotationModule.getAnnotationObject(method);
-            if (annotation != null) {
-                objectList.add(new Parameter(name, annotation).getValue());
-            }
-        }
-        return objectList;
-    }
-
-    public List<List<Object>> getPluginMethodData(String name, Module annotationModule) {
-        List<List<Object>> objectList = new ArrayList<>();
-        for (int i = 0; i < getLoadedPlugins().length; i++) {
-            objectList.add(getPluginMethodData(i, name, annotationModule));
-        }
-        return objectList;
+    public Object[] getPluginMethodData(int index, String name, Module annotationModule) {
+        return annotationManager.getPluginMethodData(index, name, annotationModule);
     }
 
     public Object getPluginData(int index, String name) {
-        Annotation annotation = classAnnotation.getAnnotationObject(getLoadedPlugins()[index].getClass());
-        return new Parameter(name, annotation).getValue();
+        return annotationManager.getClassData(index, name);
     }
 
     public Object[] getPluginData(String name) {

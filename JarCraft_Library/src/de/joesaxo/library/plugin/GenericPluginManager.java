@@ -74,7 +74,7 @@ public class GenericPluginManager<P> {
 		return Array.removeEmptyLines(instances);
 	}
 
-	private void addClasses(P[] newClasses) {
+	protected void addClasses(P[] newClasses) {
 		if (newClasses == null || newClasses.length <= 0) return;
 		if (pluginClasses == null) {
 			pluginClasses = newClasses;

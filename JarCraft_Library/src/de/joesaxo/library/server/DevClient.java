@@ -1,13 +1,12 @@
 package de.joesaxo.library.server;
 
+import de.joesaxo.library.server.notificator.EServerNotification;
+import de.joesaxo.library.annotation.AnnotationManager;
+
 import java.io.IOException;
 import java.net.Socket;
 
-import de.joesaxo.library.server.interfaces.IConnection;
-import de.joesaxo.library.server.interfaces.IReceiver;
-import de.joesaxo.library.server.interfaces.ITimeOut;
-
-import static de.joesaxo.library.server.MessageType.*;
+import static de.joesaxo.library.server.EMessageType.*;
 
 public class DevClient {
 
@@ -29,22 +28,15 @@ public class DevClient {
 
 	private IOStream stream;
 
-	private IReceiver iReceiver;
-	private IConnection iConnection;
-	private ITimeOut iTimeOut;
+	private AnnotationManager annotationManager;
 
 	// ------------------------------ constructors
 	// ----------------------------------
 
-	public DevClient(IReceiver iReceiver, IConnection iConnection) {
-		this.iConnection = iConnection;
-		init(iReceiver);
-	}
-	
-	private void init(IReceiver iReceiver) {
+	public DevClient(AnnotationManager annotationManager) {
+		this.annotationManager = annotationManager;
 		connected = false;
 		disconnectOnTimeOut = true;
-		this.iReceiver = iReceiver;
 		setMaxTimeOut(defaultMaxTimeOut);
 		setDelayTime(defaultDelayTime);
 	}
@@ -52,11 +44,7 @@ public class DevClient {
 	public void setDisconnectOnTimeOut(boolean disconnectOnTimeOut) {
 		this.disconnectOnTimeOut = disconnectOnTimeOut;
 	}
-	
-	public void setTimeOutInterface(ITimeOut iTimeOut) {
-		this.iTimeOut = iTimeOut;
-	}
-	
+
 	public void setMaxTimeOut(long maxTimeOut) {
 		this.maxTimeOut = maxTimeOut;
 		if (delayTime <= maxTimeOut) delayTime = maxTimeOut * 2;
@@ -77,7 +65,7 @@ public class DevClient {
 		openStreams(client);
 		// connection established
 		connected = true;
-		if (iConnection != null) iConnection.establishedConnection(clientId);
+		annotationManager.invokeMethods(EServerNotification.ESTABLISHEDCONNECTION.getModule(), clientId);
 		return true;
 	}
 	
@@ -95,7 +83,9 @@ public class DevClient {
 	private void checkForNewMessages() {
 		String message = stream.read(MESSAGE);
 		if (message != null) {
-			iReceiver.IncommingMessage(clientId, message);
+			annotationManager.invokeMethods(EServerNotification.NEWMESSAGE.getModule(), new Object[]{clientId, message});
+			annotationManager.invokeMethods(EServerNotification.NEWMESSAGE.getModule().addParameter("type", message), clientId);
+			//iReceiver.IncommingMessage(clientId, message);
 		}
 	}
 
@@ -120,8 +110,9 @@ public class DevClient {
 			if (message != null && message.equals(String.valueOf(lastPing))) {
 				pinging = false;
 			} else if (deltaTime(lastPing) > maxTimeOut) {
+				annotationManager.invokeMethods(EServerNotification.TIMEDOUT.getModule(), new Object[]{clientId, deltaTime(lastPing)});
 				if (disconnectOnTimeOut) stopClient();
-				if (iTimeOut != null) iTimeOut.timedOut(clientId, deltaTime(lastPing));
+				//if (iTimeOut != null) iTimeOut.timedOut(clientId, deltaTime(lastPing));
 			}
 		}
 	}
@@ -144,11 +135,11 @@ public class DevClient {
 		} catch (IOException e) {}
 	}
 
-	private boolean send(String message, MessageType messageType) {
+	private boolean send(String message, EMessageType messageType) {
 		return stream.write(message, messageType);
 	}
 
-	private boolean send(long message, MessageType messageType) {
+	private boolean send(long message, EMessageType messageType) {
 		return send(String.valueOf(message), messageType);
 	}
 
@@ -171,6 +162,7 @@ public class DevClient {
 		if (stream != null) {
 			closeStreams();
 		}
+		annotationManager.invokeMethods(EServerNotification.STOPPED.getModule(), clientId);
 	}
 	
 }

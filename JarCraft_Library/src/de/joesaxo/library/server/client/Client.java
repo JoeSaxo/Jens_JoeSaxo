@@ -1,22 +1,39 @@
 package de.joesaxo.library.server.client;
 
+import de.joesaxo.library.server.notificator.AServer;
+import de.joesaxo.library.server.notificator.EServerNotification;
+import de.joesaxo.library.annotation.AnnotationManager;
+
 import java.lang.Thread.State;
 
-import de.joesaxo.library.server.interfaces.IConnection;
-import de.joesaxo.library.server.interfaces.IReceiver;
-import de.joesaxo.library.server.interfaces.ITimeOut;
-
-public class Client implements IConnection {
+public class Client {
 
 	private ClientRunnable runnableClient;
 	private Thread thread;
 
-	public Client(String IP, int port, IReceiver iReceiver) {
-		runnableClient = new ClientRunnable(IP, port, iReceiver, this);
+	private AnnotationManager annotationManager;
+
+	public Client(String IP, int port) {
+		annotationManager = new AnnotationManager(this);
+		runnableClient = new ClientRunnable(IP, port, annotationManager);
 	}
 
-	public Client(String IP, int port, IReceiver iReceiver, IConnection iConnection) {
-		runnableClient = new ClientRunnable(IP, port, iReceiver, iConnection);
+	public Client(String IP, int port, Object annotatedClass) {
+		annotationManager = new AnnotationManager(annotatedClass);
+		runnableClient = new ClientRunnable(IP, port, annotationManager);
+	}
+
+	public Client(String IP, int port, Object[] annotatedClasses) {
+		annotationManager = new AnnotationManager(annotatedClasses);
+		runnableClient = new ClientRunnable(IP, port, annotationManager);
+	}
+
+	public void setAnnotationClass(Object cls) {
+		annotationManager.setClass(cls);
+	}
+
+	public void setAnnotationClasses(Object[] classes) {
+		annotationManager.setClasses(classes);
 	}
 
 	// ------------------------------Start / Stop -----------------------------
@@ -41,11 +58,7 @@ public class Client implements IConnection {
 	public void setDisconnectOnTimeOut(boolean disconnectOnTimeOut) {
 		runnableClient.setDisconnectOnTimeOut(disconnectOnTimeOut);
 	}
-	
-	public void setTimeOutInterface(ITimeOut iTimeOut) {
-		runnableClient.setTimeOutInterface(iTimeOut);
-	}
-	
+
 	public void setMaxTimeOut(long maxTimeOut) {
 		runnableClient.setMaxTimeOut(maxTimeOut);
 	}
@@ -71,7 +84,8 @@ public class Client implements IConnection {
 
 	// ---------------------------- Implementation ---------------------------
 
-	@Override // IConnection
+	// IConnection
+	@AServer(EServerNotification.ESTABLISHEDCONNECTION)
 	public void establishedConnection(String clientIP) {}
 
 }

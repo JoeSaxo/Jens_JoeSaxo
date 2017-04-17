@@ -1,15 +1,13 @@
 package de.joesaxo.library.server.server;
 
+import de.joesaxo.library.server.DevClient;
+import de.joesaxo.library.annotation.AnnotationManager;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-
-import de.joesaxo.library.server.DevClient;
-import de.joesaxo.library.server.interfaces.IConnection;
-import de.joesaxo.library.server.interfaces.IReceiver;
-import de.joesaxo.library.server.interfaces.ITimeOut;
 
 class ServerRunnable extends Thread {
 
@@ -23,18 +21,14 @@ class ServerRunnable extends Thread {
 	private DevClient[] clients;
 	private ServerSocket server;
 
-	private IConnection iConnection;
-	private IReceiver iReceiver;
-	private ITimeOut iTimeOut;
+	private AnnotationManager annotationManager;
 
-	ServerRunnable(int port, int maxClients, IReceiver iReceiver, IConnection iConnection) {
-		this.iReceiver = iReceiver;
-		iTimeOut = null;
+	ServerRunnable(int port, int maxClients, AnnotationManager annotationManager) {
+		this.annotationManager = annotationManager;
 		disconnectOnTimeOut = true;
 		maxTimeOut = DevClient.defaultMaxTimeOut;
 		delayTime = DevClient.defaultDelayTime;
 		this.port = port;
-		this.iConnection = iConnection;
 		clients = new DevClient[maxClients];
 	}
 
@@ -61,10 +55,9 @@ class ServerRunnable extends Thread {
 				
 				
 				{ //creating DevClient
-					DevClient client = new DevClient(iReceiver, iConnection);
+					DevClient client = new DevClient(annotationManager);
 					addClient(client);
 					client.setDisconnectOnTimeOut(disconnectOnTimeOut);
-					client.setTimeOutInterface(iTimeOut);
 					client.setMaxTimeOut(maxTimeOut);
 					client.setDelayTime(delayTime);
 					client.start(socketclient);
@@ -97,13 +90,6 @@ class ServerRunnable extends Thread {
 		this.disconnectOnTimeOut = disconnectOnTimeOut;
 		for (int i = 0;  i < connectedClients(); i++) {
 			clients[i].setDisconnectOnTimeOut(disconnectOnTimeOut);
-		}
-	}
-	
-	void setTimeOutInterface(ITimeOut iTimeOut) {
-		this.iTimeOut = iTimeOut;
-		for (int i = 0;  i < connectedClients(); i++) {
-			clients[i].setTimeOutInterface(iTimeOut);
 		}
 	}
 	
