@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="PluginTest">
-    <output-path>$PROJECT_DIR$/../../PluginTest</output-path>
-    <root id="archive" name="PluginTest.zip">
-      <element id="module-output" name="PluginTestModule" />
-    </root>
-  </artifact>
-</component>
