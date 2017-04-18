@@ -1,12 +1,14 @@
 package de.joesaxo.library.annotation;
 
 import com.sun.org.apache.xpath.internal.operations.Mod;
+import de.joesaxo.library.array.Array;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -75,12 +77,40 @@ public class Module {
     }
 
 
+    private Annotation getAnnotationObject(Annotation[] annotations) {
+        for (Annotation annotation : annotations) {
+            if (this.matches(annotation)) {
+                return annotation;
+            }
+        }
+        return null;
+    }
 
     public Annotation getAnnotationObject(Method method) {
-        return AnnotationHandler.getAnnotationObject(method.getDeclaredAnnotations(), this);
+        return getAnnotationObject(method.getDeclaredAnnotations());
     }
 
     public Annotation getAnnotationObject(Class<?> cls) {
-        return AnnotationHandler.getAnnotationObject(cls.getAnnotations(), this);
+        return getAnnotationObject(cls.getAnnotations());
+    }
+
+    public Object[] filterAnnotatedObjects(Object[] classes) {
+        Object[] newClasses = Arrays.copyOf(classes, classes.length);
+        for (int i = 0; i < newClasses.length; i++) {
+            if (this.getAnnotationObject(newClasses[i].getClass()) == null) newClasses[i] = null;
+        }
+        newClasses = Array.removeEmptyLines(newClasses);
+        if (newClasses  == null) return new Object[0];
+        return newClasses;
+    }
+
+    public Method[] filterAnnotatedMethods(Method[] methods) {
+        Method[] newMethods = Arrays.copyOf(methods, methods.length);
+        for (int i = 0; i < newMethods.length; i++) {
+            if (this.getAnnotationObject(newMethods[i]) == null) newMethods[i] = null;
+        }
+        newMethods = Array.removeEmptyLines(newMethods);
+        if (newMethods == null) return new Method[0];
+        return newMethods;
     }
 }

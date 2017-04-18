@@ -17,16 +17,6 @@ public class Server {
 		runnableServer = new ServerRunnable(port, maxclients, annotationManager);
 	}
 
-	public Server(int port, int maxclients, Object annotatedClass) {
-		annotationManager = new AnnotationManager(annotatedClass);
-		runnableServer = new ServerRunnable(port, maxclients, annotationManager);
-	}
-
-	public Server(int port, int maxclients, Object[] annotatedClasses) {
-		annotationManager = new AnnotationManager(annotatedClasses);
-		runnableServer = new ServerRunnable(port, maxclients, annotationManager);
-	}
-
 	public void setAnnotationClass(Object cls) {
 		annotationManager.setClass(cls);
 	}
@@ -68,9 +58,9 @@ public class Server {
 
 	// ----------------------- external Access ----------------------------
 
-	public boolean disconnect(String clientid) {
+	public boolean disconnect(String client) {
 		if (!runnableServer.isAlive()) return false;
-		return runnableServer.disconnect(clientid);
+		return runnableServer.disconnect(client);
 	}
 
 	public boolean disconnectAll() {
@@ -79,39 +69,41 @@ public class Server {
 		return true;
 	}
 
-	public boolean isConnected(String clientid) {
+	public boolean isConnected(String client) {
 		if (!runnableServer.isAlive()) return false;
-		return runnableServer.isConnected(clientid);
+		return runnableServer.isConnected(client);
 	}
 
 	public int connectedClients() {
 		return runnableServer.connectedClients();
 	}
 
-	public String getClientIP(int clientidn) {
-		return runnableServer.getClientIP(clientidn);
+	public String getClient(int clientId) {
+		return runnableServer.getClient(clientId);
 	}
 
 	public String[] getClients() {
-		return runnableServer.getClients();
+		String[] clients = new String[connectedClients()];
+		for (int i = 0; i < clients.length; i++) {
+			clients[i] = runnableServer.getClient(i);
+		}
+		return clients;
 	}
 
 	// ------------------------ Send ---------------------------------------
 
 	public boolean SendAll(String message) {
 		if (!runnableServer.isAlive()) return false;
-		runnableServer.SendAll(message);
+		String[] clients = getClients();
+		for (int i = 0; i < clients.length; i++) {
+			Send(clients[i], message);
+		}
 		return true;
 	}
 
-	public boolean Send(String clientid, String message) {
+	public boolean Send(String client, String message) {
 		if (!runnableServer.isAlive()) return false;
-		return runnableServer.Send(clientid, message);
+		return runnableServer.Send(client, message);
 	}
-
-	// ---------------------------- Implementation ---------------------------
-
-	@AServer(EServerNotification.ESTABLISHEDCONNECTION) // IConnection
-	public void establishedConnection(String clientIP) {}
 
 }

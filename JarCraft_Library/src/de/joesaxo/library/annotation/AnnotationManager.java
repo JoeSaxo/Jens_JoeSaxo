@@ -67,7 +67,7 @@ public class AnnotationManager {
 
     public boolean setClasses(Object[] classes) {
         if (classFilterModule != null) {
-            this.classes = AnnotationHandler.filterAnnotatedObjects(classes, classFilterModule);
+            this.classes = classFilterModule.filterAnnotatedObjects(classes);
         } else {
             this.classes = classes;
         }
@@ -81,10 +81,10 @@ public class AnnotationManager {
     public void invokeMethods(Module methodModule, Module classModule, Object[] parameters) {
         Object[] classes = this.classes;
         if (classModule != null) {
-            classes = AnnotationHandler.filterAnnotatedObjects(this.classes, classModule);
+            classes = classModule.filterAnnotatedObjects(this.classes);
         }
         for (Object cls : classes) {
-            for (Method method : AnnotationHandler.filterAnnotatedMethods(cls.getClass().getDeclaredMethods(), methodModule)) {
+            for (Method method : methodModule.filterAnnotatedMethods(cls.getClass().getDeclaredMethods())) {
                 if (MethodHandler.isInvokableMethod(method, parameters)) {
                     MethodHandler.invokeMethod(method, cls, parameters);
                 }

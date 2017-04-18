@@ -16,7 +16,8 @@ public class MyClient {
 	}
 
 	public void start() {
-		client = new Client("0.0.0.0", 56711, this);
+		client = new Client("0.0.0.0", 56711);
+		client.setAnnotationClass(this);
 		client.start();
 		while (!client.isConnected()) {
 			System.out.print("");
@@ -55,7 +56,7 @@ public class MyClient {
         System.out.println("[" + clientIP + "]: " + message);
     }
 
-    @AServer(value = EServerNotification.NEWMESSAGE, type = "testMessage") // only called if the text of the message is "testMessage"
+    @AServer(value = EServerNotification.NEWMESSAGE, message = "testMessage") // only called if the text of the message is "testMessage"
     public void IncommingTestMessage(String clientIP) {
         System.out.println("[" + clientIP + "]: " + "(preSet) testMessage");
     }

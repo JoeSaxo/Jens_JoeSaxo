@@ -109,9 +109,9 @@ class ServerRunnable extends Thread {
 
 	// ------------------------------ help methods --------------------------
 
-	private int getClientIDN(String clientid) {
+	private int getClientId(String client) {
 		for (int i = 0; i < connectedClients(); i++) {
-			if (clients[i].getClientID().equals(clientid)) {
+			if (clients[i].getClientID().equals(client)) {
 				return i;
 			}
 		}
@@ -150,9 +150,9 @@ class ServerRunnable extends Thread {
 
 	// ------------------------------ external Access -------------------------
 
-	boolean disconnect(String clientid) {
-		if (!isConnected(clientid)) return false;
-		clients[getClientIDN(clientid)].stopClient();
+	boolean disconnect(String client) {
+		if (!isConnected(client)) return false;
+		clients[getClientId(client)].stopClient();
 		return true;
 	}
 
@@ -169,38 +169,23 @@ class ServerRunnable extends Thread {
 		return clients.length;
 	}
 
-	boolean isConnected(String clientid) {
+	boolean isConnected(String sClient) {
 		for (DevClient client : clients) {
-			if (client.getClientID() == clientid) return client.isConnected();
+			if (client.getClientID() == sClient) return client.isConnected();
 		}
 		return false;
 	}
 
-	String getClientIP(int clientidn) {
-		if (clients[clientidn] == null) return null;
-		return clients[clientidn].getClientID();
+	String getClient(int clientid) {
+		if (clients[clientid] == null) return null;
+		return clients[clientid].getClientID();
 	}
 
-	String[] getClients() {
-		String[] clientIPs = new String[connectedClients()];
-
-		for (int i = 0; i < clientIPs.length; i++) {
-			clientIPs[i] = clients[i].getClientID();
-		}
-
-		return clientIPs;
-	}
 
 	// --------------------- Send -----------------------------
 
-	void SendAll(String message) {
-		for (int i = 0; i < connectedClients(); i++) {
-			clients[i].send(message);
-		}
-	}
-
 	boolean Send(String clientid, String message) {
-		return clients[getClientIDN(clientid)].send(message);
+		return clients[getClientId(clientid)].send(message);
 	}
 
 }

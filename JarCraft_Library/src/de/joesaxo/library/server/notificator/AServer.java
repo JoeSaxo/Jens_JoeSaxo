@@ -11,6 +11,8 @@ public @interface AServer {
 
     EServerNotification value();
 
-    String type() default "";
+    String message() default "";
+
+    String client() default "";
 
 }

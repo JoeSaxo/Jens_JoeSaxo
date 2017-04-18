@@ -14,13 +14,14 @@ public class MyServer {
 	}
 
 	public void start() {
-		server = new Server(56711, 20, this);
+		server = new Server(56711, 20);
+		server.setAnnotationClass(this);
 		server.start();
 	}
 
 	@AServer(EServerNotification.TIMEDOUT)
 	public void timedOut(String clientIP, Long timeout) {
-		System.out.println("[Server]: Client " + clientIP + " lost connection");
+		System.out.println("[Server]: Client " + clientIP + " lost connection after " + timeout + " milliseconds");
 	}
 
 	@AServer(EServerNotification.NEWMESSAGE)

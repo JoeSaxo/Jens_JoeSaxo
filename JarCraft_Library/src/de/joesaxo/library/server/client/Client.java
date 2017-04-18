@@ -18,16 +18,6 @@ public class Client {
 		runnableClient = new ClientRunnable(IP, port, annotationManager);
 	}
 
-	public Client(String IP, int port, Object annotatedClass) {
-		annotationManager = new AnnotationManager(annotatedClass);
-		runnableClient = new ClientRunnable(IP, port, annotationManager);
-	}
-
-	public Client(String IP, int port, Object[] annotatedClasses) {
-		annotationManager = new AnnotationManager(annotatedClasses);
-		runnableClient = new ClientRunnable(IP, port, annotationManager);
-	}
-
 	public void setAnnotationClass(Object cls) {
 		annotationManager.setClass(cls);
 	}
@@ -74,18 +64,12 @@ public class Client {
 		return runnableClient.send(message);
 	}
 
-	public String getClientID() {
+	public String getClient() {
 		return runnableClient.getClientID();
 	}
 
 	public boolean isConnected() {
 		return runnableClient.isConnected();
 	}
-
-	// ---------------------------- Implementation ---------------------------
-
-	// IConnection
-	@AServer(EServerNotification.ESTABLISHEDCONNECTION)
-	public void establishedConnection(String clientIP) {}
 
 }
