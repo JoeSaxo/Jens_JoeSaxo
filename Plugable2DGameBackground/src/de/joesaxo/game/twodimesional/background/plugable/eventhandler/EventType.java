@@ -1,0 +1,47 @@
+package de.joesaxo.game.twodimesional.background.plugable.eventhandler;
+
+/**
+ * Created by Jens on 06.05.2017.
+ */
+
+public enum EventType {
+
+    KEY_PRESSED_EVENT,
+
+    KEY_RELEASED_EVENT,
+
+    KEY_TYPED_EVENT,
+
+    MOUSE_CLICK_EVENT,
+
+    MOUSE_PRESS_EVENT,
+
+    MOUSE_RELEASE_EVENT,
+
+    MOUSE_ENTER_EVENT,
+
+    MOUSE_EXIT_EVENT,
+
+    MOUSE_DRAGGED_EVENT,
+
+    MOUSE_MOVED_EVENT,
+
+    MOUSE_CHANGED_POSITION_EVENT,
+
+    MOUSE_OVER_COMPONENT_EVENT,
+
+    BUTTON_CLICK_EVENT,
+
+    START_EVENT,
+
+    TICK_EVENT,
+
+    TICK_OVERTIME_EVENT,
+
+    STOP_EVENT,
+
+    WINDOW_STATE_CHANGED_EVENT,
+
+    PAINT_EVENT
+
+}

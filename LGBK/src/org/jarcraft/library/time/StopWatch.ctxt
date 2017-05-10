@@ -1,0 +1,14 @@
+#BlueJ class context
+comment0.params=
+comment0.target=StopWatch()
+comment1.params=
+comment1.target=boolean\ start()
+comment2.params=
+comment2.target=boolean\ stop()
+comment3.params=
+comment3.target=long\ getTime()
+comment4.params=
+comment4.target=boolean\ isRunning()
+comment5.params=
+comment5.target=void\ reset()
+numComments=6

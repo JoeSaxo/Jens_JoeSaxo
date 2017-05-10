@@ -1,0 +1,14 @@
+#BlueJ class context
+comment0.params=
+comment0.target=ArrayNumber()
+comment1.params=length
+comment1.target=ArrayNumber(int)
+comment2.params=upperLimit
+comment2.target=void\ fill(int)
+comment3.params=element
+comment3.target=java.lang.String\ printElement(java.lang.Integer)
+comment4.params=elementOne\ elementTwo
+comment4.target=boolean\ smallerAs(java.lang.Integer,\ java.lang.Integer)
+comment5.params=args
+comment5.target=void\ main(java.lang.String[])
+numComments=6
