@@ -1,5 +1,7 @@
 package de.lgbk.alich.jens;
 
+import de.lgbk.alich.jens.intellij.Method;
+
 import java.util.Random;
 
 /**
@@ -33,10 +35,12 @@ public class ArrayNumber extends Array<Integer> {
     }
 
     public static void main(String[] args) {
-        ArrayNumber array = new ArrayNumber(20);
+        Array array = new ArrayNumber(20);
         array.fill();
         array.printArray();
         array.mergesort();
         array.printArray();
     }
+
+
 }

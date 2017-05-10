@@ -1,6 +1,5 @@
 package de.joesaxo.library.server;
 
-import de.joesaxo.library.annotation.Module;
 import de.joesaxo.library.server.notificator.EServerNotification;
 import de.joesaxo.library.annotation.AnnotationManager;
 
@@ -8,6 +7,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import static de.joesaxo.library.server.EMessageType.*;
+import static de.joesaxo.library.server.notificator.EServerNotification.*;
 
 public class DevClient {
 
@@ -66,7 +66,7 @@ public class DevClient {
 		openStreams(client);
 		// connection established
 		connected = true;
-		callAnnotation(EServerNotification.ESTABLISHEDCONNECTION, null);
+		ESTABLISHEDCONNECTION.callAnnotation(annotationManager, getClientID(), null);
 		return true;
 	}
 	
@@ -84,7 +84,7 @@ public class DevClient {
 	private void checkForNewMessages() {
 		String message = stream.read(MESSAGE);
 		if (message != null) {
-		    callAnnotation(EServerNotification.NEWMESSAGE, message);
+		    NEWMESSAGE.callAnnotation(annotationManager, getClientID(), message);
 			//annotationManager.invokeMethods(EServerNotification.NEWMESSAGE.getModule(), new Object[]{clientId, message});
 			//annotationManager.invokeMethods(EServerNotification.NEWMESSAGE.getModule().addParameter("message", message), clientId);
 			//iReceiver.IncommingMessage(clientId, message);
@@ -112,7 +112,7 @@ public class DevClient {
 			if (message != null && message.equals(String.valueOf(lastPing))) {
 				pinging = false;
 			} else if (deltaTime(lastPing) > maxTimeOut) {
-				callAnnotation(EServerNotification.TIMEDOUT, deltaTime(lastPing));
+				TIMEDOUT.callAnnotation(annotationManager, getClientID(), deltaTime(lastPing));
 			    //annotationManager.invokeMethods(EServerNotification.TIMEDOUT.getModule(), new Object[]{clientId, deltaTime(lastPing)});
 				if (disconnectOnTimeOut) stopClient();
 				//if (iTimeOut != null) iTimeOut.timedOut(clientId, deltaTime(lastPing));
@@ -165,37 +165,42 @@ public class DevClient {
 		if (stream != null) {
 			closeStreams();
 		}
-		callAnnotation(EServerNotification.STOPPED, null);
+		STOPPED.callAnnotation(annotationManager, getClientID(), null);
 		//annotationManager.invokeMethods(EServerNotification.STOPPED.getModule(), clientId);
 	}
 
 	// ---------------------------- Annotation call ----------------------
 
-    private void callAnnotation(EServerNotification notification, Object atribute) {
-        Module module = notification.getModule();
+    /*
+    private void callAnnotation(EServerNotification notification, Object attribute) {
+        AnnotationFilter module = notification.getModule();
+		Parameter clientSet = new Parameter("client", getClientID());
+		Parameter clientUnSet = new Parameter("client", "");
+		Parameter message = new Parameter("message", attribute);
 	    switch (notification) {
             case ESTABLISHEDCONNECTION:
-                annotationManager.invokeMethods(module, clientId);
-                annotationManager.invokeMethods(module.addParameter("client", clientId));
+                annotationManager.invokeMethods(module.setParameters(new Parameter[]{clientUnSet}), clientId);
+                annotationManager.invokeMethods(module.setParameters(clientSet));
                 break;
             case NEWMESSAGE:
-                annotationManager.invokeMethods(module, new Object[]{clientId, atribute});
-                annotationManager.invokeMethods(module.addParameter("client", clientId), atribute);
-                module = notification.getModule();
-                annotationManager.invokeMethods(module.addParameter("message", atribute), clientId);
-                annotationManager.invokeMethods(module.addParameter("client", clientId));
+                annotationManager.invokeMethods(module.addParameterr("client", "", true).addParameterr("message", ""), new Object[]{clientId, atribute});
+                annotationManager.invokeMethods(module.addParameterr("client", clientId, true).addParameterr("message", ""), atribute);
+                module = module.addParameterr("message", atribute, true);
+                annotationManager.invokeMethods(module, clientId);
+                annotationManager.invokeMethods(module.addParameterr("client", clientId));
                 break;
             case TIMEDOUT:
-                annotationManager.invokeMethods(module, new Object[]{clientId, atribute});
-                annotationManager.invokeMethods(module.addParameter("client", clientId), atribute);
+                annotationManager.invokeMethods(module.addParameterr("client", "", true), new Object[]{clientId, atribute});
+                annotationManager.invokeMethods(module.addParameterr("client", clientId, true), atribute);
                 break;
             case STOPPED:
-                annotationManager.invokeMethods(module, clientId);
-                annotationManager.invokeMethods(module.addParameter("client", clientId));
+                annotationManager.invokeMethods(module.addParameterr("client", "", true), clientId);
+                annotationManager.invokeMethods(module.addParameterr("client", clientId, true));
                 break;
             default:
                 break;
         }
     }
+    //*/
 
 }

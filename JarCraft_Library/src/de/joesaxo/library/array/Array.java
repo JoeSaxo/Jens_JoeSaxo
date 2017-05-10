@@ -8,7 +8,6 @@ import java.util.Arrays;
  */
 public class Array <T> {
 
-
     public static <T> T[] removeEmptyLines(T[] array) {
         Class<T> arrayType = null;
         int empty = 0;
@@ -38,6 +37,7 @@ public class Array <T> {
     }
 
     public static <T> T[] addToArray(T[] oldArray, T[] newElements) {
+        if (newElements.length == 0) return oldArray;
         T[] array = Arrays.copyOf(oldArray, oldArray.length + newElements.length);
         for (int i = 0; i < newElements.length; i++) {
             array[oldArray.length + i] = newElements[i];

@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/JarCraft_Library/JarCraft_Library.iml" filepath="$PROJECT_DIR$/JarCraft_Library/JarCraft_Library.iml" />
       <module fileurl="file://$PROJECT_DIR$/LGBK/LGBK.iml" filepath="$PROJECT_DIR$/LGBK/LGBK.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Plugable2DGameBackground/Plugable2DGameBackground.iml" filepath="$PROJECT_DIR$/Plugable2DGameBackground/Plugable2DGameBackground.iml" />
       <module fileurl="file://$PROJECT_DIR$/PluginTestModule/PluginTestModule.iml" filepath="$PROJECT_DIR$/PluginTestModule/PluginTestModule.iml" />
       <module fileurl="file://$PROJECT_DIR$/TestModule/TestModule.iml" filepath="$PROJECT_DIR$/TestModule/TestModule.iml" />
     </modules>

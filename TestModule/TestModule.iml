@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="JarCraft_Library" />
     <orderEntry type="module" module-name="PluginTestModule" />
+    <orderEntry type="module" module-name="LGBK" />
   </component>
 </module>

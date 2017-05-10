@@ -1,6 +1,5 @@
 package de.joesaxo.library.annotation;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import de.joesaxo.library.array.Array;
 
 import java.lang.annotation.Annotation;
@@ -14,9 +13,12 @@ import java.util.List;
 /**
  * Created by Jens on 15.04.2017.
  */
-public class Module {
-
+@Deprecated
+public class ModuleOLD {
+/*
     private List<Parameter> parameters;
+
+    private IAnnotationFilter annotationHandler;
 
     private Class<? extends Annotation> annotation;
 
@@ -32,19 +34,43 @@ public class Module {
         parameters = new ArrayList<>();
     }
 
-    public Module addParameter(Parameter parameter) {
+    private Module(Module module) {
+        this.annotation = module.getAnnotation();
+        parameters = new ArrayList<>();
+        parameters.addAll(module.parameters);
+    }
+
+    public void setAnnotationHandler(IAnnotationFilter annotationHandler) {
+        this.annotationHandler = annotationHandler;
+    }
+
+    public Module addParameterr(Parameter parameter) {
         parameters.add(parameter);
         return this;
     }
 
-    public Module addParameter(String method, Object value) {
-        parameters.add(new Parameter(method, value));
-        return this;
+    public Module addParameterr(Parameter parameter, boolean createNewModule) {
+        if (createNewModule) {
+            return new Module(this).addParameterr(parameter);
+        } else {
+            return addParameterr(parameter);
+        }
     }
 
-    public Module addParameter(Object value) {
-        parameters.add(new Parameter(value));
-        return this;
+    public Module addParameterr(String method, Object value, boolean createNewModule) {
+        return addParameterr(new Parameter(method, value), createNewModule);
+    }
+
+    public Module addParameterr(String method, Object value) {
+        return addParameterr(new Parameter(method, value));
+    }
+
+    public Module addParameterr(Object value, boolean createNewModule) {
+        return addParameterr(new Parameter(value), createNewModule);
+    }
+
+    public Module addParameterr(Object value) {
+        return addParameterr(new Parameter(value));
     }
 
     public int parameters() {
@@ -63,17 +89,12 @@ public class Module {
         if (!annotation.annotationType().equals(this.annotation)) return false;
         for (int i = 0; i < this.parameters(); i++) {
             Parameter parameter = this.getParameter(i);
-            if (!parameter.matches(annotation)) return false;
+            if (!parameter.matches(annotation)) {
+                return false;
+            }
         }
+        if (annotationHandler != null && !annotationHandler.acceptAnnotation(annotation)) return false;
         return true;
-    }
-
-    public Module getCopy() {
-        Module copy = new Module(annotation);
-        for (Parameter parameter : parameters) {
-            copy.addParameter(parameter);
-        }
-        return copy;
     }
 
 
@@ -107,10 +128,14 @@ public class Module {
     public Method[] filterAnnotatedMethods(Method[] methods) {
         Method[] newMethods = Arrays.copyOf(methods, methods.length);
         for (int i = 0; i < newMethods.length; i++) {
-            if (this.getAnnotationObject(newMethods[i]) == null) newMethods[i] = null;
+            Annotation annotation = this.getAnnotationObject(newMethods[i]);
+            if (annotation == null) newMethods[i] = null;
         }
         newMethods = Array.removeEmptyLines(newMethods);
         if (newMethods == null) return new Method[0];
         return newMethods;
     }
+
+//*/
+
 }

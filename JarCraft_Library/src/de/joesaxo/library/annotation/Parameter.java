@@ -8,35 +8,39 @@ import java.lang.reflect.Method;
  */
 public class Parameter {
 
-    String method;
+    String methodName;
     Object value;
 
-    public Parameter(String method, Object value) {
-        this.method = method;
-        this.value = value;
-    }
-    public Parameter(Object value) {
-        method = "value";
+    public Parameter(String methodName, Object value) {
+        this.methodName = methodName;
         this.value = value;
     }
 
-    public Parameter(String method, Annotation annotation) {
-        this.method = method;
-        value = getValueFromAnnotation(annotation, method);
+    public Parameter(String methodName) {
+        this.methodName = methodName;
     }
 
-    private static Object getValueFromAnnotation(Annotation annotation, String name) {
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
+    public Object generateValueFromAnnotation(Annotation annotation) {
+        value = generateValueFromAnnotation(annotation, methodName);
+        return value;
+    }
+
+    public static Object generateValueFromAnnotation(Annotation annotation, String name) {
         Method[] methods = MethodHandler.getMethodsFromAnnotation(annotation);
         for (Method method : methods) {
             if (method.getName().equals(name)) {
-                return getValue(method, annotation);
+                return MethodHandler.invokeMethod(method, annotation);
             }
         }
         return null;
     }
 
-    public String getMethod() {
-        return method;
+    public String getMethodName() {
+        return methodName;
     }
 
     public Object getValue() {
@@ -44,12 +48,16 @@ public class Parameter {
     }
 
     boolean matches(Annotation annotation) {
-        return getValue().equals(getValueFromAnnotation(annotation, getMethod()));
+        if (getValue() == null) {
+            return generateValueFromAnnotation(annotation, getMethodName()) == null;
+        }
+        return getValue().equals(generateValueFromAnnotation(annotation, getMethodName()));
     }
 
-
-
-    private static Object getValue(Method annotationMethod, Annotation annotation) {
-        return MethodHandler.invokeMethod(annotationMethod, annotation);
+    public boolean matches(Parameter parameter) {
+        if (parameter.getValue() == null) {
+            return value == null;
+        }
+        return (parameter.getMethodName().equals(methodName) && parameter.getValue().equals(value));
     }
 }

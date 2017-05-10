@@ -14,7 +14,8 @@ public class Client {
 	private AnnotationManager annotationManager;
 
 	public Client(String IP, int port) {
-		annotationManager = new AnnotationManager(this);
+		annotationManager = new AnnotationManager();
+		setAnnotationClass(this);
 		runnableClient = new ClientRunnable(IP, port, annotationManager);
 	}
 

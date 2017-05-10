@@ -19,6 +19,7 @@ public class MethodHandler {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
+            System.out.println(e.getCause());
             e.printStackTrace();
         }
         return null;
@@ -37,40 +38,53 @@ public class MethodHandler {
         if (neededParameters.length != parameters.length) return false;
 
         for (int i = 0; i < parameters.length; i++) {
-            if (!parameters[i].getClass().equals(neededParameters[i])) return false;
+            /*Class<?> cls = parameters[i].getClass();
+            boolean matches;
+            do {
+                matches = cls.equals(neededParameters[i]);
+                cls = cls.getSuperclass();
+            } while (!matches || cls != null);
+*/
+            //if (!parameters[i].getClass().equals(neededParameters[i])) return false;
+            //*/
+            if (!checkMethodParameters(parameters[i].getClass(), neededParameters[i])) return false;
         }
         return true;
     }
 
-    public static boolean isObjetctMethod(Method method) {
-        Method[] methodsOfClassObject = Object.class.getDeclaredMethods();
-        for (Method objectMethod : methodsOfClassObject) {
-            if (method.equals(objectMethod)) return true;
+    public static boolean checkMethodParameters(Class<?> firstClass, Type secondClass) {
+
+        if (firstClass.equals(secondClass)) return true;
+
+        for (Class<?> newFirstClass : firstClass.getInterfaces()) {
+            if (checkMethodParameters(newFirstClass, secondClass)) return true;
         }
+
+        if (checkMethodParameters(firstClass.getSuperclass(), secondClass)) return true;
+
         return false;
     }
 
-    public static Method[] removeObjectMethods(Method[] methods) {
+
+    public static Method[] getMethodsFromAnnotation(Annotation annotation) {
+        return annotation.annotationType().getDeclaredMethods();
+    }
+
+    public static Method[] getInvocableMethods(Method[] methods, Object[] parameters) {
         int unneededMethods = 0;
         for (Method method : methods) {
-            if (isObjetctMethod(method)) unneededMethods++;
+            if (!isInvokableMethod(method, parameters)) unneededMethods++;
         }
         Method[] newMethods = new Method[methods.length - unneededMethods];
         int skippedMethods = 0;
         for (int i = 0; i < methods.length; i++) {
-            if (!isObjetctMethod(methods[i])) {
+            if (isInvokableMethod(methods[i], parameters)) {
                 newMethods[i-skippedMethods] = methods[i];
             } else {
                 skippedMethods++;
             }
         }
         return newMethods;
-    }
-
-
-    public static Method[] getMethodsFromAnnotation(Annotation annotation) {
-        Method[] methods = annotation.annotationType().getDeclaredMethods();
-        return removeObjectMethods(methods);
     }
 
 }

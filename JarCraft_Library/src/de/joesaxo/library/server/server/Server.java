@@ -13,7 +13,8 @@ public class Server {
 	// ----------------------- Constructors -----------------------------------
 
 	public Server(int port, int maxclients) {
-		annotationManager = new AnnotationManager(this);
+		annotationManager = new AnnotationManager();
+		setAnnotationClass(this);
 		runnableServer = new ServerRunnable(port, maxclients, annotationManager);
 	}
 

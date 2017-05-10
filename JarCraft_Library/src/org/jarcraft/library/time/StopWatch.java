@@ -1,11 +1,11 @@
 package org.jarcraft.library.time;
 
-public class TimeWatch {
+public class StopWatch {
 	
 	private long start, time;
 	private boolean running;
 	
-	public TimeWatch() {
+	public StopWatch() {
 		running = false;
 		start = 0;
 		time = 0;
@@ -30,6 +30,10 @@ public class TimeWatch {
 			time = System.currentTimeMillis() - start;
 		}
 		return time;
+	}
+
+	public long getTimeDelta(long secondTime) {
+		return secondTime - getTime();
 	}
 	
 	public boolean isRunning() {

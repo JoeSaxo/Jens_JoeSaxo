@@ -1,41 +1,44 @@
 package de.lgbk.alich.jens;
 
-import java.util.Random;
+import de.lgbk.alich.jens.intellij.Method;
+import org.jarcraft.library.time.StopWatch;
+
 
 public abstract class Array<T>
 {
     private Object[] elements;
 
+    private StopWatch stopWatch;
+
     // creates an array whith a length of 10
     public Array() {
-        elements = new Object[10];
+        this(10);
     }
 
     // creates an array whith a defined length
     public Array(int length) {
         elements = new Object[length];
+        stopWatch = new StopWatch();
     }
 
+    @Method("fillArray")
     // fills the Array with random numbers between 1 und 100
     public void fill() {
         fill(100);
     }
 
+    @Method("fillArray")
     // fills the Array with random numbers between 1 und upperLimit
     public abstract void fill(int upperLimit);
 
+    @Method("printArray")
     // prints the array on the terminal
     public void printArray() {
         System.out.print("[ ");
-        for (int i=0; i<elements.length; i++)
-        {
-            System.out.print(objectPrintElement(elements[i]) + " ");
+        for (Object element : elements) {
+            System.out.print(printElement(convert(element)) + " ");
         }
         System.out.println("]");
-    }
-
-    private String objectPrintElement(Object element) {
-        return printElement(convert(element));
     }
 
     public abstract String printElement(T element);
@@ -86,8 +89,10 @@ public abstract class Array<T>
     }
 
     // sorts the array with the bubblesort process
-    public void bublesort()
+    @Method("bubbleSort")
+    public long bubblesort()
     {
+        stopWatch.start();
         //ausgeben();
         for(int i=0; i<elements.length-1; i++)
         {
@@ -101,14 +106,21 @@ public abstract class Array<T>
                 }
             }
 
-            if (!exchanged) return;
+            if (!exchanged) {
+                stopWatch.stop();
+                return stopWatch.getTime();
+            }
             //ausgeben();
         }
+        stopWatch.stop();
+        return stopWatch.getTime();
     }
 
+    @Method("insertionSort")
     // sorts the array with the insertionsort process
-    public void insertionsort()
+    public long insertionsort()
     {
+        stopWatch.start();
         //ausgeben();
         for(int i=1; i<elements.length; i++)
         {
@@ -125,7 +137,8 @@ public abstract class Array<T>
             elements[exchangeIndex] = exchangeValue;
             //ausgeben();
         }
-
+        stopWatch.stop();
+        return stopWatch.getTime();
     }
 
     // determines the position of the smalest element from a specific index in the array
@@ -142,29 +155,39 @@ public abstract class Array<T>
         return minimalPosition;
     }
 
+    @Method("selectionSort")
     // sorts the array with the selstionsort process
-    public void selectionsort()
+    public long selectionsort()
     {
+        stopWatch.start();
         //ausgeben();
         for(int i=0; i<elements.length-1; i++)
         {
             exchange(i,minimalPosition(i));
             //ausgeben();
         }
+        stopWatch.stop();
+        return stopWatch.getTime();
     }
-
+    
+    @Method("mergeSort")
     // sorts the array with the mergesort process
-    public void mergesort() {
-        split(0, elements.length);
+    public long mergesort() {
+        stopWatch.start();
+        split(0, elements.length); // der array "zahlen" heißt hier "elements"
+        stopWatch.stop();
+        return stopWatch.getTime();
     }
 
     // sorts the defined array with the mergesort process
     private void split(int startIndex, int length) {
         if (length <= 1) return;
+        
         int leftStartIndex = startIndex;
         int leftLength = length / 2;
         int rightStartIndex = startIndex + leftLength;
         int rightLength = length - leftLength;
+        
         split(leftStartIndex, leftLength);
         split(rightStartIndex, rightLength);
         merge(leftStartIndex, leftLength, rightStartIndex, rightLength);
@@ -172,20 +195,29 @@ public abstract class Array<T>
 
     // merges the two predefined sorted array to one sorted array
     private void merge(int leftStartIndex, int leftLength, int rightStartIndex, int rightLength) {
-        Object[] newNumbers = new Object[leftLength + rightLength];
+        Object[] bufferElements = new Object[leftLength + rightLength];
+        // der variablen typ ist nicht "int" sondern "Object"
         int counterLeft = 0;
         int counterRight = 0;
 
         while (counterLeft != leftLength || counterRight != rightLength) {
+            
+            // counterLeft != leftLength &&
+            //   (counterRight == rightLength || 
+            //     ( zahlen[leftStartIndex + counterLeft] <= zahlen[rightStartIndex + counterRight] ))  
+            //               nächste linke Zahl                       nächste rechte Zahl
+            
             if (counterLeft != leftLength && (counterRight == rightLength || (objectBiggerAs(elements[rightStartIndex + counterRight], elements[leftStartIndex + counterLeft])))) {
-                newNumbers[counterLeft + counterRight] = elements[leftStartIndex + counterLeft];
+                // left number is set
+                bufferElements[counterLeft + counterRight] = elements[leftStartIndex + counterLeft];
                 counterLeft++;
             } else {
-                newNumbers[counterLeft + counterRight] = elements[rightStartIndex + counterRight];
+                // right number is set
+                bufferElements[counterLeft + counterRight] = elements[rightStartIndex + counterRight];
                 counterRight++;
             }
         }
-        override(leftStartIndex, newNumbers);
+        override(leftStartIndex, bufferElements);
     }
 
     // overrides the elements of the array with the new numbers
@@ -195,9 +227,33 @@ public abstract class Array<T>
         }
     }
 
+    public void secondQuickSort() {
+        quick(0, elements.length-1);
+    }
+
+    public void quick(int leftIndex, int rightIndex) {
+        Object pivotElement;
+        int i, j;
+        if (leftIndex >= rightIndex) return;
+        pivotElement = elements[rightIndex]; i = leftIndex-1; j = rightIndex;
+        for (;;) {
+            while (objectSmallerAs(elements[++i], pivotElement));
+            while (j > 0 && objectBiggerAs(elements[--j], pivotElement));
+            if (i >= j) break;
+            exchange(i, j);
+        }
+        exchange(i, rightIndex);
+        quick(leftIndex, i-1);
+        quick(i+1, rightIndex);
+    }
+
+    @Method("quickSort")
     // sorts the array with the quicksort process
-    public void quicksort() {
+    public long quicksort() {
+        stopWatch.start();
         pivot(0, elements.length);
+        stopWatch.stop();
+        return stopWatch.getTime();
     }
 
     //  sorts the defined array with the quicksort process
@@ -207,6 +263,7 @@ public abstract class Array<T>
         for (int i = start; i < start + length; i++) {
             if (objectBiggerAs(elements[pivotIndex], elements[i])) {
                 exchange(pivotIndex, pivotIndex+1, i);
+                pivotIndex++;
             }
         }
         pivot(start, pivotIndex - start);

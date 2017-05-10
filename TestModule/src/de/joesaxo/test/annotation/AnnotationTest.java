@@ -1,6 +1,7 @@
 package de.joesaxo.test.annotation;
 
-import de.joesaxo.library.annotation.Module;
+import de.joesaxo.library.annotation.filter.AnnotationFilter;
+import de.joesaxo.library.annotation.Parameter;
 import de.joesaxo.library.plugin.PluginManager;
 import de.joesaxo.library.plugin.AnnotationPluginManager;
 
@@ -13,16 +14,16 @@ import java.io.File;
 public class AnnotationTest {
 
     public static final String path = "C:\\Users\\Jens\\Documents\\Java\\PluginTest\\";
-
+/*
     public static void main(String[] args) {
 
-        PluginManager pluginManager = createPuginManager();
+        PluginManager pluginManager = createPluginManager();
 
         pluginManager.loadPluginsFromPath(new File(path));
 
-        Module mStart = createModuleStart();
-        Module mResume = createModuleResume();
-        Module mStop = createModuleStop();
+        AnnotationFilter mStart = createModuleStart();
+        AnnotationFilter mResume = createModuleResume();
+        AnnotationFilter mStop = createModuleStop();
 
         pluginManager.callMethod(mStart, "!?!Hello World!?!");
         pluginManager.callMethod(mResume, "!?!Hello World!?!");
@@ -44,33 +45,34 @@ public class AnnotationTest {
             }
         }
     }
-
-    public static AnnotationPluginManager createPuginManager() {
-        Module classModule = new Module(APlugin.class);
-        classModule.addParameter("load", true);
+//*/
+    public static AnnotationPluginManager createPluginManager() {
+        AnnotationFilter classModule = new AnnotationFilter().setAnnotation(APlugin.class);
+        classModule.addParameter(new Parameter("load", true));
 
         return new AnnotationPluginManager(classModule);
     }
 
-    public static Module createModuleStart() {
+    public static AnnotationFilter createModuleStart() {
         return createModule("startMethod");
     }
 
-    public static Module createModuleResume() {
+    public static AnnotationFilter createModuleResume() {
         return createModule("resumeMethod");
     }
 
-    public static Module createModuleStop() {
+    public static AnnotationFilter createModuleStop() {
         return createModule("stopMethod");
     }
 
-    public static Module createModule(String name) {
+    public static AnnotationFilter createModule(String name) {
         return createModule()
-                .addParameter("value", name);
+                .addParameter(new Parameter(name));
     }
 
-    public static Module createModule() {
-        return new Module(APlugin.class)
-                .addParameter("load", true);
+    public static AnnotationFilter createModule() {
+        return new AnnotationFilter()
+                .setAnnotation(APlugin.class)
+                .addParameter(new Parameter("load", true));
     }
 }

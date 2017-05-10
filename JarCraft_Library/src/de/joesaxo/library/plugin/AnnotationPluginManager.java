@@ -1,6 +1,6 @@
 package de.joesaxo.library.plugin;
 
-import de.joesaxo.library.annotation.Module;
+import de.joesaxo.library.annotation.filter.AnnotationFilter;
 import java.lang.annotation.Annotation;
 
 /**
@@ -8,8 +8,8 @@ import java.lang.annotation.Annotation;
  */
 public class AnnotationPluginManager extends PluginManager<Object> {
 
-    public AnnotationPluginManager(Module annotationModule) {
-        super(annotationModule, Object.class);
+    public AnnotationPluginManager(AnnotationFilter annotationFilter) {
+        super(annotationFilter, Object.class);
     }
 
     public AnnotationPluginManager(Class<? extends Annotation> annotation) {

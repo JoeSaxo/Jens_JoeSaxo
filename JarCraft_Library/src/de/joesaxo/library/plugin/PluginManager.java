@@ -1,22 +1,16 @@
 package de.joesaxo.library.plugin;
 
+import de.joesaxo.library.annotation.filter.AnnotationFilter;
 import de.joesaxo.library.annotation.AnnotationManager;
-import de.joesaxo.library.annotation.Module;
-import de.joesaxo.library.annotation.Parameter;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-import static de.joesaxo.library.plugin.PluginLoader.*;
 
 public class PluginManager<C> extends GenericPluginManager<C> {
 
-	Module classAnnotation;
+	AnnotationFilter classAnnotation;
 	AnnotationManager annotationManager;
 
-    public PluginManager(Module pluginAnnotation, Class<C> type) {
+    public PluginManager(AnnotationFilter pluginAnnotation, Class<C> type) {
         super(type);
         annotationManager = new AnnotationManager(pluginAnnotation);
         classAnnotation = pluginAnnotation;
@@ -24,8 +18,10 @@ public class PluginManager<C> extends GenericPluginManager<C> {
 
     public PluginManager(Class<? extends Annotation> annotation, Class<C> type) {
         super(type);
-        annotationManager = new AnnotationManager(new Module(annotation));
-        classAnnotation = new Module(annotation);
+        AnnotationFilter annotationFilter = new AnnotationFilter();
+        annotationFilter.setAnnotation(annotation);
+        annotationManager = new AnnotationManager(annotationFilter);
+        classAnnotation = annotationFilter;
     }
 
     public PluginManager(Class<C> type) {
@@ -42,44 +38,44 @@ public class PluginManager<C> extends GenericPluginManager<C> {
 	@Override
 	protected Class<C>[] filterClasses(Class<?>[] classes) {
 	    Class<C>[] filteredClasses = super.filterClasses(classes);
-	    if (classAnnotation != null) filteredClasses = classFilter(filteredClasses, classAnnotation);
+	    if (classAnnotation != null) filteredClasses = classAnnotation.filterClasses(filteredClasses);
 	    return filteredClasses;
 	}
 
-    public void callMethod(int index, Module annotationModule, Object[] parameters) {
-        annotationManager.invokeMethods(annotationModule, parameters);
+    public void callMethod(int index, AnnotationFilter annotationFilter, Object[] parameters) {
+        annotationManager.invokeMethods(annotationFilter, parameters);
     }
 
-    public void callMethod(int index, Module annotationModule, Object parameter) {
-        callMethod(index, annotationModule, new Object[]{parameter});
+    public void callMethod(int index, AnnotationFilter annotationFilter, Object parameter) {
+        callMethod(index, annotationFilter, new Object[]{parameter});
     }
 
-    public void callMethod(int index, Module annotationModule) {
-        callMethod(index, annotationModule, new Object[]{});
+    public void callMethod(int index, AnnotationFilter annotationFilter) {
+        callMethod(index, annotationFilter, new Object[]{});
     }
 
-    public void callMethod(Module annotationModule, Object[] parameters) {
+    public void callMethod(AnnotationFilter annotationFilter, Object[] parameters) {
         for (int i = 0; i < getLoadedPlugins().length; i++) {
-            callMethod(i, annotationModule, parameters);
+            callMethod(i, annotationFilter, parameters);
         }
     }
 
-    public void callMethod(Module annotationModule, Object parameter) {
-        callMethod(annotationModule, new Object[]{parameter});
+    public void callMethod(AnnotationFilter annotationFilter, Object parameter) {
+        callMethod(annotationFilter, new Object[]{parameter});
     }
 
-    public void callMethod(Module annotationModule) {
-        callMethod(annotationModule, new Object[]{});
+    public void callMethod(AnnotationFilter annotationFilter) {
+        callMethod(annotationFilter, new Object[]{});
     }
 
-    public Object[] getPluginMethodData(int index, String name, Module annotationModule) {
-        return annotationManager.getPluginMethodData(index, name, annotationModule);
+    public Object[] getPluginMethodData(int index, String name, AnnotationFilter annotationFilter) {
+        return annotationManager.getPluginMethodData(index, name, annotationFilter);
     }
-
+/*
     public Object getPluginData(int index, String name) {
         return annotationManager.getClassData(index, name);
-    }
-
+    }//*/
+/*
     public Object[] getPluginData(String name) {
         Object[] objects = new Object[getLoadedPlugins().length];
         for (int i = 0; i < objects.length; i++) {
@@ -87,5 +83,5 @@ public class PluginManager<C> extends GenericPluginManager<C> {
         }
         return objects;
     }
-
+//*/
 }
